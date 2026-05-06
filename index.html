@@ -160,15 +160,11 @@
     }
 
     .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px;
-  margin-bottom: 22px;
-}
-
-.grid .card:first-child {
-  min-width: 230px;
-}
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
 
     .card {
       background: rgba(255,255,255,.11);
@@ -177,6 +173,7 @@
       padding: 17px;
       box-shadow: 0 18px 40px rgba(0,0,0,.24);
       min-width: 0;
+      overflow: hidden;
     }
 
     .card span {
@@ -187,14 +184,15 @@
       letter-spacing: .6px;
     }
 
-   .card h3 {
-     font-size: clamp(22px, 2.4vw, 32px);
-     margin-top: 8px;
-     color: #fff;
-     line-height: 1.1;
-     word-break: break-word;
-     overflow-wrap: break-word;
-}
+    .card h3 {
+      font-size: clamp(22px, 2.2vw, 30px);
+      margin-top: 8px;
+      color: #fff;
+      line-height: 1.12;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .card.green h3 {
       color: #8be02d;
@@ -379,6 +377,9 @@
 
       .card h3 {
         font-size: 26px;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
       }
 
       .main {
@@ -1575,4 +1576,3 @@
   </script>
 </body>
 </html>
-
