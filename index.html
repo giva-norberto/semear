@@ -1496,8 +1496,8 @@
         ]));
       });
 
-      const conteudo = String.fromCharCode(65279) + linhas.join('
-');
+      const quebraLinha = String.fromCharCode(10);
+      const conteudo = String.fromCharCode(65279) + linhas.join(quebraLinha);
       const blob = new Blob([conteudo], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -1517,9 +1517,8 @@
       console.assert(linhaCsv(['A', 'B']) === '"A";"B"', 'linhaCsv formato falhou');
       console.assert(normalizarTexto(' Meias ') === 'meias', 'normalizarTexto falhou');
       console.assert(String.fromCharCode(65279).length === 1, 'BOM CSV falhou');
-      console.assert(['a', 'b'].join('
-').includes('
-'), 'Quebra CSV falhou');
+      const quebraTeste = String.fromCharCode(10);
+      console.assert(['a', 'b'].join(quebraTeste).includes(quebraTeste), 'Quebra CSV falhou');
       console.assert(ehCobertor('Cobertor') === true, 'ehCobertor falhou');
 
       const totaisTeste = calcularTotais([
