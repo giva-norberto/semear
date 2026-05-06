@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEMEAR - Campanha do Cobertor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+    body { min-height: 100vh; background: radial-gradient(circle at top left, #1684ff 0%, #071b50 42%, #020817 100%); color: #fff; padding: 22px; }
+    .container { max-width: 1250px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 22px; flex-wrap: wrap; }
+    .title-area h1 { font-size: clamp(28px, 5vw, 52px); color: #8be02d; line-height: 1; text-transform: uppercase; letter-spacing: 1px; }
+    .title-area h2 { font-size: clamp(20px, 4vw, 38px); margin-top: 6px; letter-spacing: 4px; }
+    .top-controls { display: grid; grid-template-columns: 140px 150px; gap: 10px; align-items: end; }
+    .box, .form-box, .table-box { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); border-radius: 24px; padding: 20px; box-shadow: 0 18px 50px rgba(0,0,0,.26); }
+    .phrase { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); border-radius: 24px; padding: 20px; margin-bottom: 22px; text-align: center; box-shadow: 0 18px 50px rgba(0,0,0,.25); }
+    .phrase strong { color: #8be02d; font-size: 30px; font-style: italic; }
+    label { display: block; font-size: 13px; color: #dbe7ff; margin-bottom: 7px; font-weight: 800; }
+    input, select, textarea { width: 100%; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.96); color: #071b50; border-radius: 15px; padding: 13px; font-size: 15px; outline: none; margin-bottom: 13px; }
+    textarea { resize: vertical; min-height: 42px; }
+    input:focus, select:focus, textarea:focus { border-color: #8be02d; box-shadow: 0 0 0 4px rgba(139,224,45,.18); }
+    button { width: 100%; border: none; border-radius: 16px; padding: 14px; font-size: 15px; font-weight: 900; cursor: pointer; color: #06133b; background: linear-gradient(135deg, #a7ff3d, #6ecf18); box-shadow: 0 14px 30px rgba(110,207,24,.35); }
+    button:hover { filter: brightness(1.05); }
+    .secondary-btn { background: rgba(255,255,255,.14); color: #fff; border: 1px solid rgba(255,255,255,.22); box-shadow: none; margin-top: 9px; }
+    .excel-btn { background: linear-gradient(135deg, #ffffff, #dbe7ff); color: #071b50; box-shadow: 0 14px 30px rgba(255,255,255,.18); margin-top: 9px; }
+    .hidden { display: none; }
+    .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 22px; }
+    .card { background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.18); border-radius: 20px; padding: 17px; box-shadow: 0 18px 40px rgba(0,0,0,.24); }
+    .card span { color: #b9cdfd; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; }
+    .card h3 { font-size: clamp(22px, 4vw, 34px); margin-top: 8px; color: #fff; }
+    .card.green h3 { color: #8be02d; }
+    .main { display: grid; grid-template-columns: 370px 1fr; gap: 20px; align-items: start; }
+    .content-stack { display: grid; gap: 18px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .tab-btn { width: auto; padding: 11px 16px; box-shadow: none; background: rgba(255,255,255,.13); color: #fff; border: 1px solid rgba(255,255,255,.20); }
+    .tab-btn.active { background: linear-gradient(135deg, #a7ff3d, #6ecf18); color: #06133b; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 16px; }
+    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.12); vertical-align: middle; }
+    th { color: #8be02d; font-size: 12px; text-transform: uppercase; letter-spacing: .7px; }
+    td { color: #fff; font-size: 14px; }
+    .pill { display: inline-block; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.16); font-size: 12px; font-weight: 800; }
+    .remove { width: auto; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.12); color: #fff; box-shadow: none; border: 1px solid rgba(255,255,255,.22); font-size: 13px; }
+    .empty { color: #c9d6ff; text-align: center; padding: 24px; }
+    .status { margin-bottom: 14px; color: #dfffc8; font-size: 14px; min-height: 20px; }
+    .footer-info { margin-top: 22px; color: #dbe7ff; font-size: 14px; text-align: center; opacity: .9; }
+    @media (max-width: 1050px) { .grid { grid-template-columns: repeat(2, 1fr); } .main { grid-template-columns: 1fr; } .top-controls { grid-template-columns: 1fr; width: 100%; } }
+    @media (max-width: 650px) { body { padding: 14px; } .grid { grid-template-columns: 1fr; } .header { text-align: center; justify-content: center; } table { display: block; overflow-x: auto; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="title-area">
+        <h1>Campanha do Cobertor</h1>
+        <h2>SEMEAR</h2>
+      </div>
+      <div class="top-controls">
+        <div>
+          <label for="anoCampanha">Ano</label>
+          <select id="anoCampanha"></select>
+        </div>
+        <div>
+          <label for="valorUnitario">Valor cobertor</label>
+          <input id="valorUnitario" type="number" step="0.01" min="0.01" value="14.99" />
+        </div>
+      </div>
+    </header>
+
+    <section class="phrase">
+      <p>Neste inverno, seja o <strong>calor</strong> que alguém precisa.</p>
+    </section>
+
+    <div class="status" id="statusSistema">Carregando sistema...</div>
+
+    <section class="grid">
+      <div class="card"><span>Total dinheiro</span><h3 id="totalValor">R$ 0,00</h3></div>
+      <div class="card"><span>Pessoas doadoras</span><h3 id="totalPessoas">0</h3></div>
+      <div class="card green"><span>Cobertores teóricos</span><h3 id="totalCobertores">0</h3></div>
+      <div class="card"><span>Itens recebidos</span><h3 id="totalItensRecebidos">0</h3></div>
+      <div class="card"><span>Entidades</span><h3 id="totalEntidades">0</h3></div>
+      <div class="card"><span>Itens distribuídos</span><h3 id="totalItensDistribuidos">0</h3></div>
+    </section>
+
+    <section class="box" style="margin-bottom:20px;">
+      <div class="tabs">
+        <button class="tab-btn active" type="button" data-tab="doacoes">Doações</button>
+        <button class="tab-btn" type="button" data-tab="distribuicoes">Distribuição</button>
+        <button class="tab-btn" type="button" data-tab="historico">Histórico</button>
+      </div>
+
+      <div id="abaDoacoes">
+        <main class="main">
+          <section class="form-box">
+            <h3>Nova doação</h3>
+            <label for="nome">Nome da pessoa</label>
+            <input id="nome" type="text" placeholder="Ex: João Silva" autocomplete="off" />
+            <label for="tipo">Tipo de doação</label>
+            <select id="tipo">
+              <option value="dinheiro">Dinheiro</option>
+              <option value="item">Doação de item</option>
+            </select>
+            <div id="campoDinheiro">
+              <label for="valor">Valor em dinheiro</label>
+              <input id="valor" type="number" step="0.01" min="0" placeholder="Ex: 50,00" />
+            </div>
+            <div id="campoItem" class="hidden">
+              <label for="item">Item doado</label>
+              <input id="item" type="text" placeholder="Ex: Meias, toucas, cobertor" />
+              <label for="quantidade">Quantidade</label>
+              <input id="quantidade" type="number" step="1" min="1" placeholder="Ex: 500" />
+              <label for="unidade">Unidade</label>
+              <input id="unidade" type="text" placeholder="Ex: pares, unidades, caixas" />
+            </div>
+            <button id="btnAdicionar" type="button">Adicionar doação</button>
+            <button id="btnExportar" type="button" class="excel-btn">Exportar Excel</button>
+            <button id="btnImprimir" type="button" class="secondary-btn">Imprimir relatório</button>
+          </section>
+          <section class="content-stack">
+            <section class="table-box"><h3>Doações registradas</h3><div id="listaDoacoes"></div></section>
+            <section class="table-box"><h3>Resumo de itens recebidos</h3><div id="resumoItens"></div></section>
+          </section>
+        </main>
+      </div>
+
+      <div id="abaDistribuicoes" class="hidden">
+        <main class="main">
+          <section class="form-box">
+            <h3>Nova distribuição</h3>
+            <label for="entidade">Entidade / grupo</label>
+            <input id="entidade" type="text" placeholder="Ex: Gesto de Amor" />
+            <label for="cidade">Cidade / região</label>
+            <input id="cidade" type="text" placeholder="Ex: Contagem" />
+            <label for="itemDistribuido">Item entregue</label>
+            <input id="itemDistribuido" type="text" placeholder="Ex: Cobertor, meias, toucas" />
+            <label for="quantidadeDistribuida">Quantidade</label>
+            <input id="quantidadeDistribuida" type="number" min="1" step="1" placeholder="Ex: 80" />
+            <label for="obsDistribuicao">Observação</label>
+            <textarea id="obsDistribuicao" placeholder="Opcional"></textarea>
+            <button id="btnAdicionarDistribuicao" type="button">Adicionar distribuição</button>
+          </section>
+          <section class="content-stack">
+            <section class="table-box"><h3>Distribuições registradas</h3><div id="listaDistribuicoes"></div></section>
+            <section class="table-box"><h3>Resumo por entidade</h3><div id="resumoEntidades"></div></section>
+          </section>
+        </main>
+      </div>
+
+      <div id="abaHistorico" class="hidden">
+        <section class="table-box"><h3>Histórico das campanhas</h3><div id="historicoCampanhas"></div></section>
+        <section class="table-box" style="margin-top:18px;">
+          <h3>Criar novo ano</h3>
+          <label for="novoAno">Ano da campanha</label>
+          <input id="novoAno" type="number" placeholder="Ex: 2027" />
+          <button id="btnCriarAno" type="button">Criar ano</button>
+          <button id="btnImportarHistorico" type="button" class="excel-btn">Importar histórico 2021 a 2025 no Firebase</button>
+        </section>
+      </div>
+    </section>
+
+    <p class="footer-info">Os dados são salvos no Firebase. Você pode acessar pelo computador ou celular usando o mesmo link.</p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCNPtz7hSeDiO76TEj-9e9MkDQDK_DJmNo',
+      authDomain: 'semear-campanha.firebaseapp.com',
+      projectId: 'semear-campanha',
+      storageBucket: 'semear-campanha.firebasestorage.app',
+      messagingSenderId: '415755657991',
+      appId: '1:415755657991:web:5b9a0242ebab6e55e5dba2'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const VALOR_PADRAO = 14.99;
+    let anoAtual = '2026';
+    let campanhas = [];
+    let doacoes = [];
+    let distribuicoes = [];
+    const el = (id) => document.getElementById(id);
+
+    function setStatus(texto) { el('statusSistema').textContent = texto || ''; }
+    function formatarMoeda(valor) { return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+    function dataHoje() { return new Date().toLocaleDateString('pt-BR'); }
+    function obterValorUnitario() { const valor = Number(el('valorUnitario').value); return valor > 0 ? valor : VALOR_PADRAO; }
+    function linhaCsv(colunas) { return colunas.map((valor) => '"' + String(valor ?? '').replace(/"/g, '""') + '"').join(';'); }
+    function normalizarTexto(valor) { return String(valor || '').trim().toLowerCase(); }
+    function escaparHtml(valor) {
+      return String(valor ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function garantirAnoInicial() {
+      const ref = doc(db, 'campanhas', '2026');
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        await setDoc(ref, { ano: '2026', nome: 'Campanha do Cobertor 2026', valorUnitario: VALOR_PADRAO, criadoEm: serverTimestamp() });
+      }
+    }
+
+    async function carregarCampanhas() {
+      const snap = await getDocs(collection(db, 'campanhas'));
+      campanhas = [];
+      snap.forEach((d) => campanhas.push({ id: d.id, ...d.data() }));
+      campanhas.sort((a, b) => Number(a.id) - Number(b.id));
+      const select = el('anoCampanha');
+      select.innerHTML = '';
+      campanhas.forEach((campanha) => {
+        const option = document.createElement('option');
+        option.value = campanha.id;
+        option.textContent = campanha.id;
+        select.appendChild(option);
+      });
+      if (!campanhas.some((c) => c.id === anoAtual)) anoAtual = campanhas.length ? campanhas[campanhas.length - 1].id : '2026';
+      select.value = anoAtual;
+    }
+
+    async function carregarConfiguracaoAno() {
+      const snap = await getDoc(doc(db, 'campanhas', anoAtual));
+      const dados = snap.exists() ? snap.data() : {};
+      el('valorUnitario').value = dados.valorUnitario || VALOR_PADRAO;
+    }
+
+    async function salvarConfiguracaoAno() {
+      await setDoc(doc(db, 'campanhas', anoAtual), { ano: anoAtual, nome: 'Campanha do Cobertor ' + anoAtual, valorUnitario: obterValorUnitario(), atualizadoEm: serverTimestamp() }, { merge: true });
+      renderizarTudo();
+    }
+
+    async function carregarDoacoes() {
+      const snap = await getDocs(query(collection(db, 'campanhas', anoAtual, 'doacoes'), orderBy('criadoEm', 'desc')));
+      doacoes = [];
+      snap.forEach((d) => doacoes.push({ firebaseId: d.id, ...d.data() }));
+    }
+
+    async function carregarDistribuicoes() {
+      const snap = await getDocs(query(collection(db, 'campanhas', anoAtual, 'distribuicoes'), orderBy('criadoEm', 'desc')));
+      distribuicoes = [];
+      snap.forEach((d) => distribuicoes.push({ firebaseId: d.id, ...d.data() }));
+    }
+
+    async function recarregarAno() {
+      try {
+        setStatus('Carregando dados do ano ' + anoAtual + '...');
+        await carregarConfiguracaoAno();
+        await carregarDoacoes();
+        await carregarDistribuicoes();
+        renderizarTudo();
+        setStatus('Dados carregados e salvos no Firebase.');
+      } catch (erro) {
+        console.error(erro);
+        setStatus('Erro ao carregar dados. Confira as regras do Firestore.');
+      }
+    }
+
+    async function adicionarDoacao() {
+      const nome = el('nome').value.trim();
+      const tipo = el('tipo').value;
+      if (!nome) return alert('Informe o nome da pessoa.');
+      let dados = { nome, tipo, data: dataHoje(), criadoEm: serverTimestamp() };
+      if (tipo === 'dinheiro') {
+        const valor = Number(el('valor').value);
+        if (!valor || valor <= 0) return alert('Informe um valor válido.');
+        dados = { ...dados, valor, item: '', quantidade: '', unidade: '' };
+      } else {
+        const item = el('item').value.trim();
+        const quantidade = Number(el('quantidade').value);
+        const unidade = el('unidade').value.trim() || 'unidades';
+        if (!item) return alert('Informe o item doado.');
+        if (!quantidade || quantidade <= 0) return alert('Informe a quantidade do item.');
+        dados = { ...dados, valor: '', item, quantidade, unidade };
+      }
+      await addDoc(collection(db, 'campanhas', anoAtual, 'doacoes'), dados);
+      limparFormularioDoacao();
+      await recarregarAno();
+    }
+
+    async function excluirDoacao(firebaseId) {
+      if (!firebaseId) return alert('Registro não encontrado.');
+      await deleteDoc(doc(db, 'campanhas', anoAtual, 'doacoes', firebaseId));
+      await recarregarAno();
+    }
+
+    async function adicionarDistribuicao() {
+      const entidade = el('entidade').value.trim();
+      const cidade = el('cidade').value.trim();
+      const item = el('itemDistribuido').value.trim();
+      const quantidade = Number(el('quantidadeDistribuida').value);
+      const observacao = el('obsDistribuicao').value.trim();
+      if (!entidade) return alert('Informe a entidade.');
+      if (!cidade) return alert('Informe a cidade/região.');
+      if (!item) return alert('Informe o item entregue.');
+      if (!quantidade || quantidade <= 0) return alert('Informe a quantidade.');
+      await addDoc(collection(db, 'campanhas', anoAtual, 'distribuicoes'), { entidade, cidade, item, quantidade, observacao, data: dataHoje(), criadoEm: serverTimestamp() });
+      el('entidade').value = '';
+      el('cidade').value = '';
+      el('itemDistribuido').value = '';
+      el('quantidadeDistribuida').value = '';
+      el('obsDistribuicao').value = '';
+      await recarregarAno();
+    }
+
+    async function excluirDistribuicao(firebaseId) {
+      if (!firebaseId) return alert('Registro não encontrado.');
+      await deleteDoc(doc(db, 'campanhas', anoAtual, 'distribuicoes', firebaseId));
+      await recarregarAno();
+    }
+
+    async function criarAno() {
+      const novoAno = String(el('novoAno').value || '').trim();
+      if (!novoAno || novoAno.length !== 4) return alert('Informe um ano válido. Ex: 2027');
+      await setDoc(doc(db, 'campanhas', novoAno), { ano: novoAno, nome: 'Campanha do Cobertor ' + novoAno, valorUnitario: VALOR_PADRAO, criadoEm: serverTimestamp() }, { merge: true });
+      anoAtual = novoAno;
+      el('novoAno').value = '';
+      await carregarCampanhas();
+      await recarregarAno();
+      await renderizarHistorico();
+    }
+
+    async function importarHistorico() {
+      if (!confirm('Importar histórico de 2021 a 2025 no Firebase? Faça isso apenas uma vez.')) return;
+
+      const historico = {
+        '2021': {
+          valorUnitario: 17.12,
+          doacoes: [{ nome: 'Resumo 2021', tipo: 'dinheiro', valor: 2945, item: '', quantidade: '', unidade: '', data: '2021' }],
+          distribuicoes: [
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Meias', quantidade: 210, observacao: 'Pares de meias', data: '2021' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Cobertor', quantidade: 34, observacao: '', data: '2021' },
+            { entidade: 'Amigo Presente', cidade: 'BH', item: 'Cobertor', quantidade: 195, observacao: '', data: '2021' }
+          ]
+        },
+        '2022': {
+          valorUnitario: 13.99,
+          doacoes: [{ nome: 'Resumo 2022', tipo: 'dinheiro', valor: 5819.58, item: '', quantidade: '', unidade: '', data: '2022' }],
+          distribuicoes: [
+            { entidade: 'Amigo Presente', cidade: 'BH', item: 'Cobertor', quantidade: 160, observacao: '', data: '2022' },
+            { entidade: 'Casa Azul', cidade: 'Contagem', item: 'Cobertor', quantidade: 51, observacao: '', data: '2022' },
+            { entidade: 'Cenáculo Thiago', cidade: 'BH', item: 'Cobertor', quantidade: 131, observacao: '', data: '2022' },
+            { entidade: 'Cenáculo Thiago', cidade: 'BH', item: 'Meias', quantidade: 72, observacao: '', data: '2022' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Cobertor', quantidade: 60, observacao: '', data: '2022' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Meias', quantidade: 36, observacao: '', data: '2022' },
+            { entidade: 'Semear', cidade: 'Contagem', item: 'Cobertor', quantidade: 36, observacao: '', data: '2022' }
+          ]
+        },
+        '2023': {
+          valorUnitario: 14.99,
+          doacoes: [
+            { nome: 'Resumo 2023', tipo: 'dinheiro', valor: 5846.10, item: '', quantidade: '', unidade: '', data: '2023' },
+            { nome: 'Doação física 2023', tipo: 'item', valor: '', item: 'Cobertor', quantidade: 33, unidade: 'unidades', data: '2023' },
+            { nome: 'Doação física 2023', tipo: 'item', valor: '', item: 'Moletons', quantidade: 6, unidade: 'unidades', data: '2023' }
+          ],
+          distribuicoes: [
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Meias', quantidade: 86, observacao: '', data: '2023' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Cobertor', quantidade: 75, observacao: '', data: '2023' },
+            { entidade: 'Amigo Presente', cidade: 'BH', item: 'Cobertor', quantidade: 200, observacao: '', data: '2023' },
+            { entidade: 'Cenáculo Thiago', cidade: 'BH', item: 'Cobertor', quantidade: 100, observacao: '', data: '2023' },
+            { entidade: 'Semear', cidade: 'Contagem', item: 'Cobertor', quantidade: 48, observacao: '', data: '2023' }
+          ]
+        },
+        '2024': {
+          valorUnitario: 14.99,
+          doacoes: [
+            { nome: 'Resumo 2024', tipo: 'dinheiro', valor: 4594, item: '', quantidade: '', unidade: '', data: '2024' },
+            { nome: 'Doação física 2024', tipo: 'item', valor: '', item: 'Cobertor', quantidade: 6, unidade: 'unidades', data: '2024' },
+            { nome: 'Doação física 2024', tipo: 'item', valor: '', item: 'Moletons', quantidade: 6, unidade: 'unidades', data: '2024' }
+          ],
+          distribuicoes: [
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Meias', quantidade: 80, observacao: '', data: '2024' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Moletons', quantidade: 6, observacao: '', data: '2024' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Cobertor', quantidade: 75, observacao: '', data: '2024' },
+            { entidade: 'Amigo Presente', cidade: 'BH', item: 'Cobertor', quantidade: 200, observacao: '', data: '2024' },
+            { entidade: 'Cenáculo Thiago Maior', cidade: 'BH', item: 'Cobertor', quantidade: 100, observacao: '', data: '2024' },
+            { entidade: 'Semear', cidade: 'Contagem', item: 'Cobertor', quantidade: 48, observacao: '', data: '2024' }
+          ]
+        },
+        '2025': {
+          valorUnitario: 14.99,
+          doacoes: [
+            { nome: 'Resumo 2025', tipo: 'dinheiro', valor: 6085.94, item: '', quantidade: '', unidade: '', data: '2025' },
+            { nome: 'Doação física 2025', tipo: 'item', valor: '', item: 'Meias', quantidade: 180, unidade: 'unidades', data: '2025' },
+            { nome: 'Doação física 2025', tipo: 'item', valor: '', item: 'Toucas', quantidade: 72, unidade: 'unidades', data: '2025' }
+          ],
+          distribuicoes: [
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Cobertor', quantidade: 106, observacao: '', data: '2025' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Meias', quantidade: 180, observacao: '', data: '2025' },
+            { entidade: 'Gesto de Amor', cidade: 'Contagem', item: 'Toucas', quantidade: 72, observacao: '', data: '2025' },
+            { entidade: 'Amigo Presente', cidade: 'BH', item: 'Cobertor', quantidade: 80, observacao: '', data: '2025' },
+            { entidade: 'Caravana do Bem', cidade: 'Betim', item: 'Cobertor', quantidade: 80, observacao: '', data: '2025' },
+            { entidade: 'Semear', cidade: 'Contagem', item: 'Cobertor', quantidade: 40, observacao: '', data: '2025' },
+            { entidade: 'Vinha de Luz', cidade: 'Neves', item: 'Cobertor', quantidade: 100, observacao: '', data: '2025' }
+          ]
+        }
+      };
+
+      try {
+        setStatus('Importando histórico para o Firebase...');
+
+        for (const ano of Object.keys(historico)) {
+          const dadosAno = historico[ano];
+          await setDoc(doc(db, 'campanhas', ano), {
+            ano,
+            nome: 'Campanha do Cobertor ' + ano,
+            valorUnitario: dadosAno.valorUnitario,
+            importadoHistorico: true,
+            atualizadoEm: serverTimestamp()
+          }, { merge: true });
+
+          for (const doacao of dadosAno.doacoes) {
+            await addDoc(collection(db, 'campanhas', ano, 'doacoes'), { ...doacao, criadoEm: serverTimestamp() });
+          }
+
+          for (const dist of dadosAno.distribuicoes) {
+            await addDoc(collection(db, 'campanhas', ano, 'distribuicoes'), { ...dist, criadoEm: serverTimestamp() });
+          }
+        }
+
+        await carregarCampanhas();
+        await recarregarAno();
+        await renderizarHistorico();
+        setStatus('Histórico importado com sucesso no Firebase.');
+        alert('Histórico importado com sucesso!');
+      } catch (erro) {
+        console.error(erro);
+        alert('Erro ao importar histórico. Veja o console.');
+        setStatus('Erro ao importar histórico.');
+      }
+    }
+
+    function limparFormularioDoacao() {
+      el('nome').value = '';
+      el('valor').value = '';
+      el('item').value = '';
+      el('quantidade').value = '';
+      el('unidade').value = '';
+      el('nome').focus();
+    }
+
+    function alternarCampos() {
+      const tipo = el('tipo').value;
+      el('campoDinheiro').classList.toggle('hidden', tipo !== 'dinheiro');
+      el('campoItem').classList.toggle('hidden', tipo !== 'item');
+    }
+
+    function agruparItens(lista, campoItem, campoQuantidade, campoUnidade) {
+      const mapa = {};
+      lista.forEach((registro) => {
+        const item = String(registro[campoItem] || '').trim();
+        if (!item) return;
+        const unidade = String(registro[campoUnidade] || 'unidades').trim();
+        const chave = normalizarTexto(item) + '__' + normalizarTexto(unidade);
+        if (!mapa[chave]) mapa[chave] = { item, unidade, quantidade: 0 };
+        mapa[chave].quantidade += Number(registro[campoQuantidade] || 0);
+      });
+      return Object.values(mapa);
+    }
+
+    function renderizarDashboard() {
+      const totalValor = doacoes.filter((d) => d.tipo === 'dinheiro').reduce((soma, d) => soma + Number(d.valor || 0), 0);
+      const pessoas = new Set(doacoes.map((d) => normalizarTexto(d.nome)).filter(Boolean));
+      const cobertores = Math.floor(totalValor / obterValorUnitario());
+      const itensRecebidos = doacoes.filter((d) => d.tipo === 'item').reduce((soma, d) => soma + Number(d.quantidade || 0), 0);
+      const entidades = new Set(distribuicoes.map((d) => normalizarTexto(d.entidade)).filter(Boolean));
+      const itensDistribuidos = distribuicoes.reduce((soma, d) => soma + Number(d.quantidade || 0), 0);
+      el('totalValor').textContent = formatarMoeda(totalValor);
+      el('totalPessoas').textContent = pessoas.size;
+      el('totalCobertores').textContent = cobertores;
+      el('totalItensRecebidos').textContent = itensRecebidos;
+      el('totalEntidades').textContent = entidades.size;
+      el('totalItensDistribuidos').textContent = itensDistribuidos;
+    }
+
+    function renderizarDoacoes() {
+      const area = el('listaDoacoes');
+      area.innerHTML = '';
+      if (doacoes.length === 0) {
+        area.innerHTML = '<div class="empty">Nenhuma doação registrada ainda.</div>';
+        return;
+      }
+      const tabela = document.createElement('table');
+      tabela.innerHTML = '<thead><tr><th>Nome</th><th>Tipo</th><th>Detalhe</th><th>Data</th><th></th></tr></thead>';
+      const tbody = document.createElement('tbody');
+      doacoes.forEach((d) => {
+        const tr = document.createElement('tr');
+        const detalhe = d.tipo === 'dinheiro' ? formatarMoeda(d.valor) : `${d.quantidade} ${d.unidade} de ${d.item}`;
+        tr.innerHTML = `<td>${escaparHtml(d.nome)}</td><td><span class="pill">${d.tipo === 'dinheiro' ? 'Dinheiro' : 'Item'}</span></td><td>${escaparHtml(detalhe)}</td><td>${escaparHtml(d.data || '')}</td>`;
+        const td = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'remove';
+        btn.textContent = 'Excluir';
+        btn.addEventListener('click', () => excluirDoacao(d.firebaseId));
+        td.appendChild(btn);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      });
+      tabela.appendChild(tbody);
+      area.appendChild(tabela);
+    }
+
+    function renderizarResumoItens() {
+      const area = el('resumoItens');
+      const itens = agruparItens(doacoes.filter((d) => d.tipo === 'item'), 'item', 'quantidade', 'unidade');
+      if (itens.length === 0) {
+        area.innerHTML = '<div class="empty">Nenhum item recebido registrado.</div>';
+        return;
+      }
+      area.innerHTML = '<table><thead><tr><th>Item</th><th>Total</th></tr></thead><tbody>' + itens.map((i) => `<tr><td>${escaparHtml(i.item)}</td><td>${escaparHtml(i.quantidade + ' ' + i.unidade)}</td></tr>`).join('') + '</tbody></table>';
+    }
+
+    function renderizarDistribuicoes() {
+      const area = el('listaDistribuicoes');
+      area.innerHTML = '';
+      if (distribuicoes.length === 0) {
+        area.innerHTML = '<div class="empty">Nenhuma distribuição registrada ainda.</div>';
+        return;
+      }
+      const tabela = document.createElement('table');
+      tabela.innerHTML = '<thead><tr><th>Entidade</th><th>Cidade</th><th>Item</th><th>Qtd</th><th>Data</th><th></th></tr></thead>';
+      const tbody = document.createElement('tbody');
+      distribuicoes.forEach((d) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${escaparHtml(d.entidade)}</td><td>${escaparHtml(d.cidade)}</td><td>${escaparHtml(d.item)}</td><td>${escaparHtml(d.quantidade || 0)}</td><td>${escaparHtml(d.data || '')}</td>`;
+        const td = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'remove';
+        btn.textContent = 'Excluir';
+        btn.addEventListener('click', () => excluirDistribuicao(d.firebaseId));
+        td.appendChild(btn);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      });
+      tabela.appendChild(tbody);
+      area.appendChild(tabela);
+    }
+
+    function renderizarResumoEntidades() {
+      const area = el('resumoEntidades');
+      if (distribuicoes.length === 0) {
+        area.innerHTML = '<div class="empty">Nenhuma entidade atendida registrada.</div>';
+        return;
+      }
+      const mapa = {};
+      distribuicoes.forEach((d) => {
+        const chave = normalizarTexto(d.entidade) + '__' + normalizarTexto(d.cidade);
+        if (!mapa[chave]) mapa[chave] = { entidade: d.entidade, cidade: d.cidade, itens: {} };
+        const item = d.item || 'Item';
+        mapa[chave].itens[item] = (mapa[chave].itens[item] || 0) + Number(d.quantidade || 0);
+      });
+      const linhas = Object.values(mapa).map((r) => {
+        const detalhes = Object.entries(r.itens).map(([item, qtd]) => `${qtd} ${item}`).join(' + ');
+        return `<tr><td>${escaparHtml(r.entidade)}</td><td>${escaparHtml(r.cidade)}</td><td>${escaparHtml(detalhes)}</td></tr>`;
+      }).join('');
+      area.innerHTML = '<table><thead><tr><th>Entidade</th><th>Cidade</th><th>Resumo</th></tr></thead><tbody>' + linhas + '</tbody></table>';
+    }
+
+    function renderizarTudo() {
+      renderizarDashboard();
+      renderizarDoacoes();
+      renderizarResumoItens();
+      renderizarDistribuicoes();
+      renderizarResumoEntidades();
+    }
+
+    async function renderizarHistorico() {
+      const area = el('historicoCampanhas');
+      area.innerHTML = '<div class="empty">Carregando histórico...</div>';
+      const linhas = [];
+      for (const campanha of campanhas) {
+        const ano = campanha.id;
+        const doacoesSnap = await getDocs(collection(db, 'campanhas', ano, 'doacoes'));
+        const distribuicoesSnap = await getDocs(collection(db, 'campanhas', ano, 'distribuicoes'));
+        let totalValor = 0;
+        const pessoas = new Set();
+        doacoesSnap.forEach((d) => {
+          const dados = d.data();
+          if (dados.tipo === 'dinheiro') totalValor += Number(dados.valor || 0);
+          if (dados.nome) pessoas.add(normalizarTexto(dados.nome));
+        });
+        const entidades = new Set();
+        let totalDistribuido = 0;
+        distribuicoesSnap.forEach((d) => {
+          const dados = d.data();
+          if (dados.entidade) entidades.add(normalizarTexto(dados.entidade));
+          totalDistribuido += Number(dados.quantidade || 0);
+        });
+        const valorUnitario = Number(campanha.valorUnitario || VALOR_PADRAO);
+        linhas.push(`<tr><td>${escaparHtml(ano)}</td><td>${escaparHtml(formatarMoeda(totalValor))}</td><td>${Math.floor(totalValor / valorUnitario)}</td><td>${pessoas.size}</td><td>${entidades.size}</td><td>${totalDistribuido}</td></tr>`);
+      }
+      if (linhas.length === 0) {
+        area.innerHTML = '<div class="empty">Nenhum ano criado ainda.</div>';
+        return;
+      }
+      area.innerHTML = '<table><thead><tr><th>Ano</th><th>Arrecadado</th><th>Cobertores teóricos</th><th>Doadores</th><th>Entidades</th><th>Itens distribuídos</th></tr></thead><tbody>' + linhas.join('') + '</tbody></table>';
+    }
+
+    function trocarAba(nome) {
+      document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === nome));
+      el('abaDoacoes').classList.toggle('hidden', nome !== 'doacoes');
+      el('abaDistribuicoes').classList.toggle('hidden', nome !== 'distribuicoes');
+      el('abaHistorico').classList.toggle('hidden', nome !== 'historico');
+      if (nome === 'historico') renderizarHistorico();
+    }
+
+    function exportarExcel() {
+      const linhas = [];
+      const totalValor = doacoes.filter((d) => d.tipo === 'dinheiro').reduce((s, d) => s + Number(d.valor || 0), 0);
+      linhas.push(linhaCsv(['SEMEAR - Campanha do Cobertor', anoAtual]));
+      linhas.push(linhaCsv(['Valor unitário', formatarMoeda(obterValorUnitario())]));
+      linhas.push(linhaCsv(['Total dinheiro', formatarMoeda(totalValor)]));
+      linhas.push(linhaCsv(['Cobertores teóricos', Math.floor(totalValor / obterValorUnitario())]));
+      linhas.push(linhaCsv([]));
+      linhas.push(linhaCsv(['DOAÇÕES']));
+      linhas.push(linhaCsv(['Nome', 'Tipo', 'Valor', 'Item', 'Quantidade', 'Unidade', 'Data']));
+      doacoes.forEach((d) => linhas.push(linhaCsv([d.nome, d.tipo, d.valor || '', d.item || '', d.quantidade || '', d.unidade || '', d.data || ''])));
+      linhas.push(linhaCsv([]));
+      linhas.push(linhaCsv(['DISTRIBUIÇÕES']));
+      linhas.push(linhaCsv(['Entidade', 'Cidade', 'Item', 'Quantidade', 'Data', 'Observação']));
+      distribuicoes.forEach((d) => linhas.push(linhaCsv([d.entidade, d.cidade, d.item, d.quantidade, d.data || '', d.observacao || ''])));
+
+      const conteudo = String.fromCharCode(65279) + linhas.join('\n');
+      const blob = new Blob([conteudo], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'semear-campanha-cobertor-' + anoAtual + '.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function executarTestesBasicos() {
+      console.assert(formatarMoeda(14.99).includes('14,99'), 'formatarMoeda falhou');
+      console.assert(linhaCsv(['A', 'B']).includes(';'), 'linhaCsv falhou');
+      console.assert(linhaCsv(['A', 'B']) === '"A";"B"', 'linhaCsv formato falhou');
+      console.assert(normalizarTexto(' Meias ') === 'meias', 'normalizarTexto falhou');
+      console.assert(String.fromCharCode(65279).length === 1, 'BOM CSV falhou');
+      console.assert(['a', 'b'].join('\n').includes('\n'), 'Quebra CSV falhou');
+    }
+
+    async function iniciar() {
+      try {
+        executarTestesBasicos();
+        document.querySelectorAll('.tab-btn').forEach((btn) => btn.addEventListener('click', () => trocarAba(btn.dataset.tab)));
+        el('tipo').addEventListener('change', alternarCampos);
+        el('btnAdicionar').addEventListener('click', adicionarDoacao);
+        el('btnAdicionarDistribuicao').addEventListener('click', adicionarDistribuicao);
+        el('btnExportar').addEventListener('click', exportarExcel);
+        el('btnImprimir').addEventListener('click', () => window.print());
+        el('btnCriarAno').addEventListener('click', criarAno);
+        el('btnImportarHistorico').addEventListener('click', importarHistorico);
+        el('valorUnitario').addEventListener('change', salvarConfiguracaoAno);
+        el('anoCampanha').addEventListener('change', async () => {
+          anoAtual = el('anoCampanha').value;
+          await recarregarAno();
+        });
+        alternarCampos();
+        await garantirAnoInicial();
+        await carregarCampanhas();
+        await recarregarAno();
+      } catch (erro) {
+        console.error(erro);
+        setStatus('Erro ao iniciar. Verifique se o Firestore está em modo de teste.');
+      }
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
