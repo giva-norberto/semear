@@ -306,6 +306,46 @@
       opacity: .9;
     }
 
+    .auth-box {
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 20px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+    }
+
+    .auth-info {
+      color: #dbe7ff;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .auth-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .auth-actions button {
+      width: auto;
+      min-width: 150px;
+      box-shadow: none;
+    }
+
+    .auth-actions .logout-btn {
+      background: rgba(255,255,255,.14);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.22);
+    }
+
+
     @media (max-width: 1050px) {
       .main {
         grid-template-columns: 1fr;
@@ -480,6 +520,22 @@
         font-size: 13px;
         line-height: 1.5;
       }
+
+      .auth-box {
+        align-items: stretch;
+        text-align: center;
+      }
+
+      .auth-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+      }
+
+      .auth-actions button {
+        width: 100%;
+      }
+
     }
 
     @media (max-width: 420px) {
@@ -522,6 +578,14 @@
         </div>
       </div>
     </header>
+
+    <section class="auth-box" id="authBox">
+      <div class="auth-info" id="authInfo">Para acessar o sistema, entre com sua conta Google autorizada.</div>
+      <div class="auth-actions">
+        <button id="btnLoginGoogle" type="button">Entrar com Google</button>
+        <button id="btnSairGoogle" type="button" class="logout-btn hidden">Sair</button>
+      </div>
+    </section>
 
     <section class="phrase">
       <p>Neste inverno, seja o <strong>calor</strong> que alguém precisa.</p>
@@ -700,6 +764,13 @@
       orderBy,
       serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: 'AIzaSyCNPtz7hSeDiO76TEj-9e9MkDQDK_DJmNo',
@@ -712,12 +783,20 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
     const VALOR_PADRAO = 14.99;
+    const EMAILS_AUTORIZADOS = [
+      'giva.norberto@gmail.com',
+      'anjovius@gmail.com'
+    ];
 
     let anoAtual = '2026';
     let campanhas = [];
     let doacoes = [];
     let distribuicoes = [];
+    let sistemaPreparado = false;
 
     const el = (id) => document.getElementById(id);
 
@@ -843,6 +922,59 @@
         entidades: entidades.size,
         itensDistribuidos
       };
+    }
+
+
+    function emailAutorizado(email) {
+      return EMAILS_AUTORIZADOS.includes(String(email || '').toLowerCase());
+    }
+
+    function alternarConteudoSistema(mostrar) {
+      document.querySelectorAll('.phrase, .grid, .box, .footer-info').forEach((elemento) => {
+        elemento.classList.toggle('hidden', !mostrar);
+      });
+    }
+
+    function atualizarAreaLogin(usuario) {
+      const autorizado = usuario && emailAutorizado(usuario.email);
+
+      el('btnLoginGoogle').classList.toggle('hidden', autorizado);
+      el('btnSairGoogle').classList.toggle('hidden', !usuario);
+      alternarConteudoSistema(!!autorizado);
+
+      if (!usuario) {
+        el('authInfo').textContent = 'Para acessar o sistema, entre com sua conta Google autorizada.';
+        setStatus('Aguardando login com Google...');
+        return;
+      }
+
+      if (!autorizado) {
+        el('authInfo').textContent = 'Conta sem permissão: ' + usuario.email + '. Entre com uma conta autorizada.';
+        setStatus('Este e-mail não tem permissão para acessar o sistema.');
+        return;
+      }
+
+      el('authInfo').textContent = 'Logado como: ' + usuario.email;
+    }
+
+    async function entrarComGoogle() {
+      try {
+        setStatus('Abrindo login do Google...');
+        await signInWithPopup(auth, provider);
+      } catch (erro) {
+        console.error(erro);
+        setStatus('Não foi possível entrar com Google.');
+        alert('Não foi possível entrar com Google. Veja o console se o erro continuar.');
+      }
+    }
+
+    async function sairGoogle() {
+      try {
+        await signOut(auth);
+      } catch (erro) {
+        console.error(erro);
+        alert('Não foi possível sair. Veja o console.');
+      }
     }
 
     async function garantirAnoInicial() {
@@ -1540,13 +1672,16 @@
       console.assert(totaisTeste.doacoesRegistradas === 3, 'doacoesRegistradas falhou');
     }
 
-    async function iniciar() {
+    async function iniciarSistemaAutenticado() {
       try {
         executarTestesBasicos();
 
-        document.querySelectorAll('.tab-btn').forEach((btn) => {
-          btn.addEventListener('click', () => trocarAba(btn.dataset.tab));
-        });
+        if (!sistemaPreparado) {
+          sistemaPreparado = true;
+
+          document.querySelectorAll('.tab-btn').forEach((btn) => {
+            btn.addEventListener('click', () => trocarAba(btn.dataset.tab));
+          });
 
         el('tipo').addEventListener('change', alternarCampos);
         el('btnAdicionar').addEventListener('click', adicionarDoacao);
@@ -1557,10 +1692,11 @@
         el('btnImportarHistorico').addEventListener('click', importarHistorico);
         el('valorUnitario').addEventListener('change', salvarConfiguracaoAno);
 
-        el('anoCampanha').addEventListener('change', async () => {
-          anoAtual = el('anoCampanha').value;
-          await recarregarAno();
-        });
+          el('anoCampanha').addEventListener('change', async () => {
+            anoAtual = el('anoCampanha').value;
+            await recarregarAno();
+          });
+        }
 
         alternarCampos();
         await garantirAnoInicial();
@@ -1572,7 +1708,25 @@
       }
     }
 
-    iniciar();
+
+    el('btnLoginGoogle').addEventListener('click', entrarComGoogle);
+    el('btnSairGoogle').addEventListener('click', sairGoogle);
+    alternarConteudoSistema(false);
+
+    onAuthStateChanged(auth, async (usuario) => {
+      atualizarAreaLogin(usuario);
+
+      if (!usuario) {
+        return;
+      }
+
+      if (!emailAutorizado(usuario.email)) {
+        await signOut(auth);
+        return;
+      }
+
+      await iniciarSistemaAutenticado();
+    });
   </script>
 </body>
 </html>
