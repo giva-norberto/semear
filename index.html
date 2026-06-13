@@ -891,7 +891,12 @@
         .filter((d) => d.tipo === 'dinheiro')
         .reduce((soma, d) => soma + Number(d.valor || 0), 0);
 
-      const cobertoresTeoricos = Math.floor(totalValor / valorUnitario);
+      const resultado = totalValor / valorUnitario;
+
+      const cobertoresTeoricos =
+        Number(resultado.toFixed(1)) % 1 === 0
+          ? Number(resultado.toFixed(0))
+          : Number(resultado.toFixed(1));
 
       const cobertoresFisicos = listaDoacoes
         .filter((d) => d.tipo === 'item' && ehCobertor(d.item))
