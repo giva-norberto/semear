@@ -1430,29 +1430,38 @@
       area.appendChild(criarTabela(['Nome', 'Tipo', 'Detalhe', 'Data', 'Ação'], linhas));
     }
 
-    function renderizarResumoItens() {
-      const area = el('resumoItens');
-      area.innerHTML = '';
+function renderizarResumoItens() {
+  const area = el('resumoItens');
+  area.innerHTML = '';
 
-      const itens = agruparItens(
-        doacoes.filter((d) => d.tipo === 'item'),
-        'item',
-        'quantidade',
-        'unidade'
-      );
+  const itens = agruparItens(
+    doacoes.filter((d) => d.tipo === 'item'),
+    'item',
+    'quantidade',
+    'unidade'
+  );
 
-      if (itens.length === 0) {
-        area.innerHTML = '<div class="empty">Nenhum item recebido registrado.</div>';
-        return;
-      }
+  const totais = calcularTotais(
+    doacoes,
+    distribuicoes,
+    obterValorUnitario()
+  );
 
-      const linhas = itens.map((i) => [
-        i.item,
-        `${i.quantidade} ${i.unidade}`
-      ]);
+  itens.unshift({
+    item: 'Cobertores',
+    quantidade: totais.cobertoresTotais,
+    unidade: 'Unidades'
+  });
 
-      area.appendChild(criarTabela(['Item', 'Total'], linhas));
-    }
+  const linhas = itens.map((i) => [
+    i.item,
+    `${i.quantidade} ${i.unidade}`
+  ]);
+
+  area.appendChild(
+    criarTabela(['Item', 'Total'], linhas)
+  );
+}
 
     function renderizarDistribuicoes() {
       const area = el('listaDistribuicoes');
